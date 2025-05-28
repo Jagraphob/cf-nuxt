@@ -6,7 +6,9 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "cf-nuxt",
 	"compatibility_date": "2025-05-17",
-	"pages_build_output_dir": "./dist",
+	"assets": {
+		"directory": "./dist",
+	},
 	"observability": {
 		"enabled": true
 	}
