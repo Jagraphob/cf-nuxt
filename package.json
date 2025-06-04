@@ -4,7 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"build": "nuxt build",
-		"dev": "pnpm wrangler dev",
+		"dev": "nuxt dev",
 		"generate": "nuxt generate",
 		"preview": "pnpm run build && wrangler dev",
 		"postinstall": "nuxt prepare",

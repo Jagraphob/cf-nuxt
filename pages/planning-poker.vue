@@ -1,3 +1,7 @@
 <template>
-    <h1>planning poker</h1>
+    <h1>planning pokers</h1>
 </template>
+
+<script lang="ts">
+
+</script>
