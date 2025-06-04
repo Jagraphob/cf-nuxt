@@ -8,6 +8,8 @@
     <ul>
       <li>
         <NuxtLink :to="{ name: 'planning-poker' }">Poker</NuxtLink>
+      </li>
+      <li>
         <NuxtLink :to="{ name: 'travel-log' }">Travel Log</NuxtLink>
       </li>
     </ul>
