@@ -2,5 +2,8 @@
 	"files.associations": {
 		"wrangler.json": "jsonc",
 		"*.css": "tailwindcss"
-	}
+	},
+	"nuxtr.intellisense.nuxtrc": true,
+	"nuxtr.intellisense.vueFiles": true,
+	"nuxtr.intellisense.nuxtignore": true,
 }
