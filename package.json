@@ -12,14 +12,16 @@
 		"cf-typegen": "wrangler types"
 	},
 	"dependencies": {
-		"@picocss/pico": "^2.1.1",
+		"@nuxt/icon": "2.0.0",
 		"@tailwindcss/vite": "^4.1.13",
-		"nuxt": "^3.17.3",
+		"nuxt": "^4.1.2",
 		"tailwindcss": "^4.1.13",
 		"vue": "^3.5.13",
 		"vue-router": "^4.5.1"
 	},
 	"devDependencies": {
+		"@iconify-json/tabler": "^1.2.23",
+		"daisyui": "^5.1.25",
 		"h3": "^1.15.3",
 		"nitro-cloudflare-dev": "^0.2.2",
 		"sass": "^1.89.0",

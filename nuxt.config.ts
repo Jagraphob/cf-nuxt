@@ -12,7 +12,7 @@ export default defineNuxtConfig({
       nodeCompat: true
     }
   },
-  modules: ["nitro-cloudflare-dev"],
+  modules: ["nitro-cloudflare-dev", "@nuxt/icon"],
   vite: {
     plugins: [
       tailwindcss()
