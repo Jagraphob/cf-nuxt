@@ -1,0 +1,11 @@
+{
+  "servers": {
+    "my-mcp-server-4b3f8741": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ]
+    }
+  }
+}

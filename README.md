@@ -19,7 +19,7 @@ Start the development server on `http://localhost:3000`:
 
 ```bash
 # pnpm
-pnpm dev
+pnpm run dev
 ```
 
 ## Production
@@ -28,8 +28,17 @@ Build the application for production:
 
 ```bash
 # pnpm
-pnpm build
+pnpm run build
 ```
+
+Deploy the appliation for production - to CloudFlare
+https://cf-nuxt.jagraphob.workers.dev
+
+```bash
+# pnpm
+pnpm run deploy
+```
+
 
 Locally preview production build:
 
