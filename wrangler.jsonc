@@ -17,6 +17,13 @@
 			"binding": "CF_NUXT_KV",
 			"id": "a84d8305c41549989f62b3b1235bf92a"
 		}
+	],
+	"d1_databases": [
+		{
+			"binding": "CF_NUXT_D1",
+			"database_name": "CF_NUXT_D1",
+			"database_id": "e35fe657-4775-48b2-917a-bb47bf79a58b"
+		}
 	]
 	/**
 	 * Smart Placement
