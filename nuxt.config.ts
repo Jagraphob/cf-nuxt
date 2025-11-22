@@ -1,4 +1,5 @@
-import tailwindcss from "@tailwindcss/vite"
+import tailwindcss from "@tailwindcss/vite";
+import "./lib/env";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -12,10 +13,17 @@ export default defineNuxtConfig({
       nodeCompat: true
     }
   },
-  modules: ["nitro-cloudflare-dev", "@nuxt/icon"],
+  modules: [
+    "nitro-cloudflare-dev",
+    "@nuxt/icon",
+    "@nuxtjs/color-mode"
+  ],
   vite: {
     plugins: [
       tailwindcss()
     ]
+  },
+  colorMode: {
+    dataValue: "theme"
   }
 })
