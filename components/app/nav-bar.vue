@@ -10,10 +10,9 @@
       <ul class="menu menu-horizontal px-1">
         <li>
           <details>
-            <summary>Tools List</summary>
+            <summary>App List</summary>
             <ul class="bg-base-100 rounded-t-none p-2 min-w-md">
-              <li><NuxtLink to="/planning-poker">Agile Poker</NuxtLink></li>
-              <li><NuxtLink to="/travel-log">Travel Log</NuxtLink></li>
+              <li><NuxtLink to="/tower-of-fortune">Tower of Fortune</NuxtLink></li>
             </ul>
           </details>
         </li>
