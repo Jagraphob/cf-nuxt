@@ -14,7 +14,7 @@ pnpm cf-typegen   # Regenerate Cloudflare bindings types (worker-configuration.d
 
 ## Architecture
 
-This is a **Nuxt 4** app deployed to **Cloudflare Workers** (module preset) serving as a personal tools platform.
+This is a **Nuxt 4** app deployed to **Cloudflare Workers** (module preset) serving as a personal tools platform. Currently the repo holds only the shared layout/navbar shell — all sub-apps have been removed, and `pages/index.vue` is an empty stub. New tools are added as sub-apps under `pages/`, `components/`, and `server/api/`.
 
 ### Cloudflare Bindings (via `event.context.cloudflare.env`)
 - **`CF_NUXT_KV`** — Cloudflare KV namespace for key-value storage
@@ -38,6 +38,6 @@ This is a **Nuxt 4** app deployed to **Cloudflare Workers** (module preset) serv
 
 ### Conventions
 - New pages go in `pages/` and are auto-routed
-- Add new app pages to the nav dropdown in `components/app/nav-bar.vue`
+- Link new app pages from `components/app/nav-bar.vue` (currently has no app links — just the theme toggle)
 - Server handlers access CF bindings through `event.context.cloudflare.env`
 - D1 interactions use Drizzle ORM; schema lives in `lib/db/`
