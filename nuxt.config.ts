@@ -16,7 +16,8 @@ export default defineNuxtConfig({
   modules: [
     "nitro-cloudflare-dev",
     "@nuxt/icon",
-    "@nuxtjs/color-mode"
+    "@nuxtjs/color-mode",
+    "nuxt-auth-utils"
   ],
   vite: {
     plugins: [
@@ -25,5 +26,9 @@ export default defineNuxtConfig({
   },
   colorMode: {
     dataValue: "theme"
+  },
+  runtimeConfig: {
+    session: { password: '' },
+    oauth: { google: { clientId: '', clientSecret: '' } }
   }
 })
