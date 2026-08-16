@@ -3,21 +3,22 @@
   useHead({ title: "Analysis" });
 
   const { api, formatMoney, formatMonth, formatDate } = useFamilyAccounting();
-  const { monthRange } = useDateRanges();
+  const { monthRange, today } = useDateRanges();
 
   const range = ref<{ from?: string; to?: string }>(monthRange(0));
 
   const { data, pending } = await useAsyncData(
     "fa-analysis",
     async () => {
-      const [summary, previous, trend] = await Promise.all([
+      const [summary, previous, trend, budgets] = await Promise.all([
         api.summary(range.value),
         api.summary(monthRange(-1)),
         // The trend is deliberately not clipped to the selected range — the point
         // of it is to show drift over time, which one month can't reveal.
         api.trend(),
+        api.budgets(today()),
       ]);
-      return { summary, previous, trend };
+      return { summary, previous, trend, budgets };
     },
     { watch: [range] },
   );
@@ -81,6 +82,18 @@
           empty-message="No spending in this period."
           @select="open"
         />
+      </section>
+
+      <section v-if="data.budgets.length" class="bg-base-200 rounded-box p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="font-semibold">Budgets right now</h2>
+          <NuxtLink to="/family-accounting/budgets" class="link link-hover text-sm">
+            Manage
+          </NuxtLink>
+        </div>
+        <!-- Always current-period, regardless of the range above: a budget is a
+             live allowance, so showing it for some past range would mislead. -->
+        <FamilyAccountingBudgetTracker :budgets="data.budgets" />
       </section>
 
       <section v-if="transfers.length" class="bg-base-200 rounded-box p-4">

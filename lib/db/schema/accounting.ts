@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import type { BudgetPeriod } from "../../periods";
 
 /**
  * Family accounting tables.
@@ -66,8 +67,47 @@ export const settings = sqliteTable("settings", {
   currency: text("currency").notNull().default("NZD"),
 });
 
+/**
+ * Budgets are a plan, not money — they never appear in `transactions` and never
+ * move the account balance. Putting them there would break the ledger.
+ *
+ * Rows are effective-dated versions: changing an amount closes the current row
+ * and opens a new one, so past periods keep the figure they were actually judged
+ * against instead of being retroactively rewritten. Boundaries are always
+ * aligned to a period start, which is what stops a period being counted twice
+ * (once for the old version, once for the new) when an amount changes mid-week.
+ */
+export const budgets = sqliteTable(
+  "budgets",
+  {
+    id: text("id").primaryKey(),
+    categoryId: text("category_id")
+      .notNull()
+      .references(() => categories.id),
+    period: text("period").$type<BudgetPeriod>().notNull(),
+    amountCents: integer("amount_cents").notNull(),
+    /** Period-aligned first day this version applies to. */
+    startDate: text("start_date").notNull(),
+    /** Last day this version applies to; null means it is still in force. */
+    endDate: text("end_date"),
+    createdBy: text("created_by").notNull(),
+    createdAt: integer("created_at")
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+    updatedAt: integer("updated_at")
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [
+    index("budgets_category_id_idx").on(t.categoryId),
+    index("budgets_start_date_idx").on(t.startDate),
+  ],
+);
+
 export type Category = typeof categories.$inferSelect;
 export type NewCategory = typeof categories.$inferInsert;
 export type Transaction = typeof transactions.$inferSelect;
 export type NewTransaction = typeof transactions.$inferInsert;
 export type Settings = typeof settings.$inferSelect;
+export type Budget = typeof budgets.$inferSelect;
+export type NewBudget = typeof budgets.$inferInsert;

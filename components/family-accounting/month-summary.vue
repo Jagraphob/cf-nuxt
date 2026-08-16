@@ -1,11 +1,15 @@
 <script lang="ts" setup>
   import type { SummaryDto } from "~/composables/useFamilyAccounting";
 
-  const props = defineProps<{
-    summary: SummaryDto | null;
-    previous?: SummaryDto | null;
-    title?: string;
-  }>();
+  const props = withDefaults(
+    defineProps<{
+      summary: SummaryDto | null;
+      previous?: SummaryDto | null;
+      title?: string;
+      comparisonLabel?: string;
+    }>(),
+    { comparisonLabel: "vs last month" },
+  );
 
   const { formatMoney } = useFamilyAccounting();
 
@@ -51,7 +55,7 @@
           class="text-xs"
           :class="deltaTone(row.label, row.delta)"
         >
-          {{ row.delta > 0 ? "▲" : "▼" }} {{ Math.abs(row.delta) }}% vs last month
+          {{ row.delta > 0 ? "▲" : "▼" }} {{ Math.abs(row.delta) }}% {{ comparisonLabel }}
         </div>
       </div>
     </div>

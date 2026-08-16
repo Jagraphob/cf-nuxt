@@ -29,6 +29,14 @@ A mobile-first household budget ledger replacing a Google Sheet. Self-contained:
 - **API auth:** `middleware/auth.ts` is client-side only and does NOT protect endpoints. Every handler calls `requireFamilyUser(event)` from `server/utils/auth.ts` first (401 no session / 403 not allowlisted).
 - **SSR data loading uses `useRequestFetch()`, not `$fetch`** — plain `$fetch` during SSR calls our own API without the session cookie and gets a 401. This is wired up once inside `useFamilyAccounting()`.
 - Charts are hand-rolled (DaisyUI `progress` bars, inline SVG) to avoid a charting dependency in the Worker bundle.
+
+#### Budgets
+- **A budget is a plan, not money.** Budgets live in their own table, never in `transactions`, and never move the account balance. Putting them in the ledger would break the reconciliation.
+- **Weeks run Monday–Sunday**, matching the original spreadsheet's rows ("5-11 Jan"). All period maths lives in `lib/periods.ts`, shared by server and client so both agree which week a date is in. It works in UTC deliberately — local `Date` arithmetic shifts days across NZ daylight-saving boundaries and would silently move entries into the wrong week twice a year.
+- **Each budget is weekly or monthly**, chosen per category (grocery is a weekly rhythm, power and rates are monthly).
+- **Rollover is on, in both directions.** Underspend and overspend both carry forward, so "remaining" is cumulative, not per-period. That makes it a simple subtraction rather than a period-by-period walk: `Σ(periods elapsed × amount) − Σ(spend since the budget began)`. The current period counts in full — a week's allowance exists on Monday, it doesn't accrue daily.
+- **Budgets are effective-dated versions.** Changing an amount closes the current row and opens a new one instead of updating in place, so past periods keep the figure they were actually judged against. Both boundaries snap to a period start (`periodStart()`), which is what prevents a period being counted twice when an amount changes mid-week. `budgets.post.ts` handles this; don't bypass it with a direct UPDATE.
+- Income categories can't be budgeted (a cap on incoming money is meaningless).
 - `lib/db/seed/2026-ledger.sql` is the one-off import of the original spreadsheet (159 transactions); replaying it against the $3,951.00 opening balance reproduces the sheet's final $2,127.08 exactly.
 
 ### Auth (Google SSO via `nuxt-auth-utils`)
@@ -65,6 +73,7 @@ A mobile-first household budget ledger replacing a Google Sheet. Self-contained:
 - `components/family-accounting/` — Components for the family accounting sub-app
 - `composables/` — Auto-imported client composables, e.g. `useFamilyAccounting()`
 - `lib/tools.ts` — Registry of sub-apps rendered as cards on the home page
+- `lib/periods.ts` — Monday-start week/month arithmetic for budgets; imported by both server and client
 - `layouts/default.vue` — Default layout wrapping all pages with `AppNavBar`
 - `layouts/family-accounting.vue` — Sub-app layout: navbar + bottom `dock` tab bar
 - `public/` — PWA manifest and icons (installable to a phone home screen; no service worker)

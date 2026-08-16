@@ -1,4 +1,12 @@
 import type { CategoryType } from "~/lib/db/schema/accounting";
+import type { BudgetPeriod } from "~/lib/periods";
+import {
+  endOfMonth,
+  endOfWeek,
+  formatPeriodLabel,
+  startOfMonth,
+  startOfWeek,
+} from "~/lib/periods";
 
 export interface CategoryDto {
   id: string;
@@ -48,6 +56,35 @@ export interface BalanceDto {
   openingCents: number;
   openingDate: string;
   totals: { income: number; expense: number; transfer: number };
+}
+
+export interface BudgetProgressDto {
+  categoryId: string;
+  name: string;
+  icon: string | null;
+  type: CategoryType;
+  period: BudgetPeriod;
+  /** This period's allowance on its own, before any carry. */
+  amountCents: number;
+  spentThisPeriodCents: number;
+  /** Carried in from earlier periods; negative means previously overspent. */
+  carriedInCents: number;
+  /** Actually available now, carry included. */
+  remainingCents: number;
+  budgetedCents: number;
+  spentSinceCents: number;
+  since: string;
+  periodStart: string;
+  periodEnd: string;
+}
+
+export interface BudgetVersionDto {
+  id: string;
+  categoryId: string;
+  period: BudgetPeriod;
+  amountCents: number;
+  startDate: string;
+  endDate: string | null;
 }
 
 const API = "/api/family-accounting";
@@ -151,6 +188,23 @@ export function useFamilyAccounting() {
     deleteTransaction: (id: string) =>
       request<{ deleted: boolean }>(`${API}/transactions/${id}`, { method: "DELETE" }),
 
+    budgets: (asOf?: string) =>
+      request<BudgetProgressDto[]>(`${API}/budgets`, {
+        query: asOf ? { asOf } : {},
+      }),
+    budgetHistory: (asOf?: string) =>
+      request<{
+        asOf: string;
+        progress: BudgetProgressDto[];
+        versions: BudgetVersionDto[];
+      }>(`${API}/budgets`, { query: { history: 1, ...(asOf ? { asOf } : {}) } }),
+    setBudgets: (body: unknown) => request(`${API}/budgets`, { method: "POST", body }),
+    stopBudget: (categoryId: string, purge = false) =>
+      request(`${API}/budgets/${categoryId}`, {
+        method: "DELETE",
+        query: purge ? { purge: 1 } : {},
+      }),
+
     balance: () => request<BalanceDto>(`${API}/balance`),
     summary: (query: Record<string, unknown> = {}) =>
       request<SummaryDto>(`${API}/summary`, { query }),
@@ -172,18 +226,35 @@ export function useFamilyAccounting() {
   };
 }
 
-/** Named date ranges shared by the history and analysis pages. */
+/**
+ * Named date ranges shared by the history and analysis pages.
+ * Weeks run Monday-Sunday, matching the original spreadsheet.
+ */
 export function useDateRanges() {
   const { toIsoDate } = useFamilyAccounting();
 
+  function today(): string {
+    return toIsoDate(new Date());
+  }
+
   function monthRange(offset = 0) {
-    const now = new Date();
-    const start = new Date(now.getFullYear(), now.getMonth() + offset, 1);
-    const end = new Date(now.getFullYear(), now.getMonth() + offset + 1, 0);
-    return { from: toIsoDate(start), to: toIsoDate(end) };
+    const anchor = new Date();
+    anchor.setDate(1); // guard against month-end overflow (e.g. 31 Mar -> 1 Mar)
+    anchor.setMonth(anchor.getMonth() + offset);
+    const iso = toIsoDate(anchor);
+    return { from: startOfMonth(iso), to: endOfMonth(iso) };
+  }
+
+  function weekRange(offset = 0) {
+    const anchor = new Date();
+    anchor.setDate(anchor.getDate() + offset * 7);
+    const iso = toIsoDate(anchor);
+    return { from: startOfWeek(iso), to: endOfWeek(iso) };
   }
 
   const presets = [
+    { key: "this-week", label: "This week", range: () => weekRange(0) },
+    { key: "last-week", label: "Last week", range: () => weekRange(-1) },
     { key: "this-month", label: "This month", range: () => monthRange(0) },
     { key: "last-month", label: "Last month", range: () => monthRange(-1) },
     {
@@ -197,5 +268,5 @@ export function useDateRanges() {
     { key: "all", label: "All time", range: () => ({ from: undefined, to: undefined }) },
   ] as const;
 
-  return { presets, monthRange };
+  return { presets, monthRange, weekRange, today, formatPeriodLabel };
 }
