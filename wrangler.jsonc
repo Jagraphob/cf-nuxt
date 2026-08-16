@@ -22,7 +22,8 @@
 		{
 			"binding": "CF_NUXT_D1",
 			"database_name": "CF_NUXT_D1",
-			"database_id": "e35fe657-4775-48b2-917a-bb47bf79a58b"
+			"database_id": "e35fe657-4775-48b2-917a-bb47bf79a58b",
+			"migrations_dir": "lib/db/migrations"
 		}
 	]
 	/**
