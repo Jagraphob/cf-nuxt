@@ -1,5 +1,8 @@
 export default defineOAuthGoogleEventHandler({
   async onSuccess(event, { user }) {
+    if (!isAllowedEmail(user.email)) {
+      return sendRedirect(event, '/?error=unauthorized')
+    }
     await setUserSession(event, {
       user: {
         id: user.sub,
